@@ -1,10 +1,10 @@
 panda web framework
 ===================
-I want to build a framework build on top of netty and akka,to make the way easier for java developers,
+I want to build a framework building on top of netty and akka,and make the life easier for java developers,
 and we could using actor model or handler/callback model,as withActor(props) or withHandler(handler)
 to finish the work.
 
-All I am working on,is trying to make the life easier,and just build on top others great work :P
+All I am working on just build on top others' great work :P
 
 required sbt,java7
 
