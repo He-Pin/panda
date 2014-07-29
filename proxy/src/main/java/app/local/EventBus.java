@@ -35,6 +35,10 @@ public class EventBus {
         for (EventBusListener listener : listeners){
             listener.onPublish(response);
         }
+        if (response.getType().equals(Message.ResponseType.COMPLETE)){
+            //need remove the listener
+            httpProxyBus.remove(response.getRequestId());
+        }
     }
 
     public void addListener(final EventBusListener eventBusListener){
