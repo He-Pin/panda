@@ -14,10 +14,12 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.udt.UdtChannel;
 import io.netty.channel.udt.nio.NioUdtProvider;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.compression.SnappyFramedDecoder;
+import io.netty.handler.codec.compression.SnappyFramedEncoder;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
-import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
-import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 
 import java.util.concurrent.ThreadFactory;
 
@@ -40,8 +42,10 @@ public class RemoteServer {
                             @Override
                             protected void initChannel(UdtChannel ch) throws Exception {
                                 ChannelPipeline channelPipeline = ch.pipeline();
-                                channelPipeline.addLast("frame-encoder",new ProtobufVarint32LengthFieldPrepender());
-                                channelPipeline.addLast("frame-decoder",new ProtobufVarint32FrameDecoder());
+                                channelPipeline.addLast("frame-encoder", new LengthFieldPrepender(4));
+                                channelPipeline.addLast("frame-decoder", new LengthFieldBasedFrameDecoder(1024*1024,0,4,0,4));
+                                channelPipeline.addLast("snappy-decoder",new SnappyFramedDecoder());
+                                channelPipeline.addLast("snappy-encoder",new SnappyFramedEncoder());
                                 channelPipeline.addLast("protobuf-encoder",new ProtobufEncoder());
                                 channelPipeline.addLast("protobuf-decoder",new ProtobufDecoder(Message.Request.getDefaultInstance()));
                                 channelPipeline.addLast("proxy-handler",remoteProxyHandler);

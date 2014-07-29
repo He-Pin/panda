@@ -16,12 +16,14 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.udt.UdtChannel;
 import io.netty.channel.udt.nio.NioUdtProvider;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.compression.SnappyFramedDecoder;
+import io.netty.handler.codec.compression.SnappyFramedEncoder;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
-import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
-import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.util.concurrent.DefaultThreadFactory;
 
 import java.util.concurrent.ThreadFactory;
@@ -49,8 +51,10 @@ public class LocalServer {
                     @Override
                     protected void initChannel(UdtChannel ch) throws Exception {
                         ChannelPipeline channelPipeline = ch.pipeline();
-                        channelPipeline.addLast("frame-encoder", new ProtobufVarint32LengthFieldPrepender());
-                        channelPipeline.addLast("frame-decoder", new ProtobufVarint32FrameDecoder());
+                        channelPipeline.addLast("frame-encoder", new LengthFieldPrepender(4));
+                        channelPipeline.addLast("frame-decoder", new LengthFieldBasedFrameDecoder(1024*1024,0,4,0,4));
+                        channelPipeline.addLast("snappy-decoder",new SnappyFramedDecoder());
+                        channelPipeline.addLast("snappy-encoder",new SnappyFramedEncoder());
                         channelPipeline.addLast("protobuf-encoder", new ProtobufEncoder());
                         channelPipeline.addLast("protobuf-decoder", new ProtobufDecoder(Message.Response.getDefaultInstance()));
                         channelPipeline.addLast("local-remote-handler",localRemoteProxyHandler);
