@@ -38,7 +38,7 @@ public class RemoteProxyHandler extends SimpleChannelInboundHandler<Message.Requ
     protected void channelRead0(ChannelHandlerContext ctx, Message.Request msg) throws Exception {
         //call the remote actor to handler it
         System.out.println(msg.getMethod() + " " + msg.getUrl());
-        final ActorRef remoteActor = actorSystem.actorOf(RemoteActor.props(ctx,asyncHttpClient),"remote-"+msg.getRequestId());
+        final ActorRef remoteActor = actorSystem.actorOf(RemoteActor.props(ctx,asyncHttpClient));
         remoteActor.tell(msg, ActorRef.noSender());
         ctx.channel().closeFuture().addListener(new ChannelFutureListener() {
             @Override

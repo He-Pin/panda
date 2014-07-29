@@ -120,7 +120,9 @@ public class LocalActor extends UntypedActor{
                         //System.out.println("Complete");
                         ctx.write(uncompleteResponse);
                         ctx.flush();
-                        getContext().unbecome();
+                        //getContext().unbecome();
+                        //after flush ,stop self
+                        getContext().stop(getSelf());
                     }
                     break;
                     default:

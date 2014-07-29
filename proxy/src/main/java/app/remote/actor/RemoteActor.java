@@ -42,6 +42,9 @@ public class RemoteActor extends UntypedActor{
         //get the response and write to the channel
         ctx.write(response);
         ctx.flush();
+        if (response.getType().equals(Message.ResponseType.COMPLETE)){
+            getContext().stop(getSelf());
+        }
     }
 
     private void handleRequest(Message.Request request) {
