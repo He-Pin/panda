@@ -1,0 +1,49 @@
+option java_package = "app.message";
+
+enum Method{
+    OPTIONS = 0;
+    GET = 1;
+    HEAD = 2;
+    POST = 3;
+    PUT = 4;
+    PATCH = 5;
+    DELETE = 6;
+    TRACE = 7;
+    CONNECT = 8;
+}
+
+message Header{
+    required string key =1;
+    required string value =2;
+}
+
+message Request{
+    required int64 requestId =1;
+    required Method method = 2;
+    required string url = 3;
+    repeated Header headers = 4;
+    optional bytes bodyPart = 5;
+}
+
+message HttpContent{
+    required bytes content =1;
+    required bool last =2;
+}
+
+enum ResponseType{
+    HEADERS = 0;
+    STATUS = 1;
+    BODYPART = 2;
+    THROWABLE = 3;
+    COMPLETE = 4;
+}
+
+message Response{
+    required int64 requestId =1;
+    required ResponseType type = 2;
+    optional string protocolText = 3;
+    optional int32 statusCode = 4;
+    repeated Header headers =5;
+    optional bytes bodyPart = 6;
+    optional string cause = 7;
+}
